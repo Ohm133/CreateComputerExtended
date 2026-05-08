@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "createcomputerextended:block/network_casing" }
+  }
+}

@@ -1,0 +1,8 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="MIT"
+
+[[mods]]
+modId="CreateComputerExtended"
+version="1.0.0"
+displayName="Create: Computer extended"
