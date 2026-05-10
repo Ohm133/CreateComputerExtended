@@ -1,27 +1,23 @@
 package com.ohm133.createcomputerextended.block;
 
+import com.ohm133.createcomputerextended.blockentity.ModBlockEntities;
 import com.ohm133.createcomputerextended.blockentity.NetworkGearboxBlockEntity;
-
 import com.simibubi.create.content.kinetics.gearbox.GearboxBlock;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
-public class NetworkGearboxBlock
-        extends GearboxBlock {
-
+public class NetworkGearboxBlock extends GearboxBlock {
     public NetworkGearboxBlock(Properties properties) {
-
         super(properties);
     }
 
     @Override
-    public BlockEntity newBlockEntity(
-            BlockPos pos,
-            BlockState state
-    ) {
+    public Class<NetworkGearboxBlockEntity> getBlockEntityClass() {
+        return NetworkGearboxBlockEntity.class;
+    }
 
-        return new NetworkGearboxBlockEntity(pos, state);
+    @Override
+    public BlockEntityType<? extends NetworkGearboxBlockEntity> getBlockEntityType() {
+        return ModBlockEntities.NETWORK_GEARBOX_BE.get();
     }
 }

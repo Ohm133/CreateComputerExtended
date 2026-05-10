@@ -24,21 +24,21 @@ public class CreateComputerExtended {
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
-                WiredElementCapability.get(),
-                ModBlockEntities.NETWORK_CASING_BE.get(),
-                (blockEntity, side) -> blockEntity
+            WiredElementCapability.get(),
+            ModBlockEntities.NETWORK_CASING_BE.get(),
+            (blockEntity, side) -> blockEntity.getNetworkElement()
         );
 
         event.registerBlockEntity(
-                WiredElementCapability.get(),
-                ModBlockEntities.NETWORK_ENCASED_SHAFT_BE.get(),
-                (blockEntity, side) -> blockEntity
+            WiredElementCapability.get(),
+            ModBlockEntities.NETWORK_ENCASED_SHAFT_BE.get(),
+            (blockEntity, side) -> blockEntity.getNetworkElement()
         );
 
         event.registerBlockEntity(
-                WiredElementCapability.get(),
-                ModBlockEntities.NETWORK_GEARBOX_BE.get(),
-                (blockEntity, side) -> blockEntity
+            WiredElementCapability.get(),
+            ModBlockEntities.NETWORK_GEARBOX_BE.get(),
+            (blockEntity, side) -> blockEntity.getNetworkElement()
         );
     }
 }
