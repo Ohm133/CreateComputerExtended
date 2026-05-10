@@ -1,8 +1,8 @@
 package com.ohm133.createcomputerextended;
 
-import com.ohm133.createcomputerextended.block.ModBlocks;
 import com.ohm133.createcomputerextended.blockentity.ModBlockEntities;
 import com.ohm133.createcomputerextended.item.ModItems;
+import com.ohm133.createcomputerextended.registry.ModBlocks;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;

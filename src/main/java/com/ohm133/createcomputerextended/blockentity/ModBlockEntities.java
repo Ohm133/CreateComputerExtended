@@ -1,7 +1,7 @@
 package com.ohm133.createcomputerextended.blockentity;
 
 import com.ohm133.createcomputerextended.CreateComputerExtended;
-import com.ohm133.createcomputerextended.block.ModBlocks;
+import com.ohm133.createcomputerextended.registry.ModBlocks;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
