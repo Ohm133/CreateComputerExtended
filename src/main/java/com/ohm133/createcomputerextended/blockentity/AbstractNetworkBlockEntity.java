@@ -50,6 +50,10 @@ public abstract class AbstractNetworkBlockEntity extends BlockEntity implements 
         }
     }
 
+    public void refreshNetworkConnections() {
+        NetworkConnector.connectNeighbours(this);
+    }
+
     @Override
     public void setRemoved() {
         if (level != null && !level.isClientSide) {
