@@ -1,3 +1,3 @@
 {
-  "parent": "createcomputerextended:block/network_gearbox"
+  "parent": "createcomputerextended:block/network_gearbox/block"
 }
