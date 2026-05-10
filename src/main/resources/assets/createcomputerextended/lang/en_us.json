@@ -1,3 +1,5 @@
 {
-  "block.createcomputerextended.network_casing": "Network Casing"
+  "block.createcomputerextended.network_casing": "Network Casing",
+  "block.createcomputerextended.network_encased_shaft": "Network Encased Shaft",
+  "block.createcomputerextended.network_gearbox": "Network Gearbox"
 }

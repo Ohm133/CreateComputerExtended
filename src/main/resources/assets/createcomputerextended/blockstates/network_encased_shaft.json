@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "createcomputerextended:block/network_encased_shaft"
+    }
+  }
+}
