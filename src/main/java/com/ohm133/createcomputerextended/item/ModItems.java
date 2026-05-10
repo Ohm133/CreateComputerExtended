@@ -1,6 +1,6 @@
 package com.ohm133.createcomputerextended.item;
 
-import com.ohm133.createcomputerextended.NetworkMod;
+import com.ohm133.createcomputerextended.CreateComputerExtended;
 import com.ohm133.createcomputerextended.block.ModBlocks;
 
 import net.minecraft.core.registries.Registries;
@@ -12,7 +12,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class ModItems {
 
     public static final DeferredRegister<Item> ITEMS =
-            DeferredRegister.create(Registries.ITEM, NetworkMod.MODID);
+            DeferredRegister.create(Registries.ITEM, CreateComputerExtended.MODID);
 
     public static final DeferredHolder<Item, BlockItem> NETWORK_CASING_ITEM =
             ITEMS.register("network_casing",
