@@ -2,24 +2,25 @@ package com.ohm133.createcomputerextended.block;
 
 import com.ohm133.createcomputerextended.blockentity.ModBlockEntities;
 import com.ohm133.createcomputerextended.blockentity.NetworkEncasedShaftBlockEntity;
-import com.simibubi.create.AllBlocks;
+import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.simpleRelays.encased.EncasedShaftBlock;
 
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
 
+@SuppressWarnings("unchecked")
 public class NetworkEncasedShaftBlock extends EncasedShaftBlock {
     public NetworkEncasedShaftBlock(Properties properties) {
-        super(properties, () -> AllBlocks.ANDESITE_CASING.get());
+        super(properties, () -> Blocks.ANDESITE);
     }
 
     @Override
-    public Class<NetworkEncasedShaftBlockEntity> getBlockEntityClass() {
-        return NetworkEncasedShaftBlockEntity.class;
+    public Class<KineticBlockEntity> getBlockEntityClass() {
+        return (Class<KineticBlockEntity>) (Class<?>) NetworkEncasedShaftBlockEntity.class;
     }
 
     @Override
-    public BlockEntityType<? extends NetworkEncasedShaftBlockEntity> getBlockEntityType() {
+    public BlockEntityType<? extends KineticBlockEntity> getBlockEntityType() {
         return ModBlockEntities.NETWORK_ENCASED_SHAFT_BE.get();
     }
 }

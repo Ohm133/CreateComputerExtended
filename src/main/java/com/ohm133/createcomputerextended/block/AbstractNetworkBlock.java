@@ -1,6 +1,6 @@
 package com.ohm133.createcomputerextended.block;
 
-import com.ohm133.createcomputerextended.blockentity.AbstractNetworkBlockEntity;
+import com.ohm133.createcomputerextended.blockentity.NetworkCableHost;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -24,9 +24,8 @@ public abstract class AbstractNetworkBlock extends Block implements EntityBlock 
     ) {
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
 
-        if (!level.isClientSide
-                && level.getBlockEntity(pos) instanceof AbstractNetworkBlockEntity networkBlock) {
-            networkBlock.refreshNetworkConnections();
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof NetworkCableHost host) {
+            host.refreshNetworkConnections();
         }
     }
 }

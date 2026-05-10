@@ -6,13 +6,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class NetworkCasingBlockEntity extends BlockEntity {
+public class NetworkCasingBlockEntity extends BlockEntity implements NetworkCableHost {
     private final NetworkCableComponent network = new NetworkCableComponent(this);
 
     public NetworkCasingBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.NETWORK_CASING_BE.get(), pos, state);
     }
 
+    @Override
     public NetworkCableComponent getNetworkElement() {
         return network;
     }
@@ -20,10 +21,6 @@ public class NetworkCasingBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
-        network.connectNeighbours();
-    }
-
-    public void refreshNetworkConnections() {
         network.connectNeighbours();
     }
 
