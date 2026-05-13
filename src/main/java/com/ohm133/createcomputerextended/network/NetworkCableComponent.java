@@ -17,6 +17,10 @@ public class NetworkCableComponent implements WiredElement {
         this.node = ComputerCraftAPI.createWiredNodeForElement(this);
     }
 
+    public BlockEntity getOwner() {
+        return owner;
+    }
+
     @Override
     public WiredNode getNode() {
         return node;
@@ -40,10 +44,12 @@ public class NetworkCableComponent implements WiredElement {
     public void connectNeighbours() {
         if (owner.getLevel() != null && !owner.getLevel().isClientSide) {
             NetworkConnector.connectNeighbours(owner, this);
+            SwivelBridgeResolver.refreshAround(owner);
         }
     }
 
     public void remove() {
+        SwivelBridgeManager.disconnectAllFor(node);
         node.remove();
     }
 }
