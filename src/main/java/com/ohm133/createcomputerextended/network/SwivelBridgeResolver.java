@@ -5,6 +5,8 @@ import com.ohm133.createcomputerextended.blockentity.NetworkCableHost;
 import dan200.computercraft.api.network.wired.WiredElement;
 import dan200.computercraft.api.network.wired.WiredElementCapability;
 
+import dev.ryanhcode.sable.sublevel.SubLevel;
+
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.SwivelBearingBlock;
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.SwivelBearingBlockEntity;
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.link_block.SwivelBearingPlateBlock;
@@ -12,16 +14,13 @@ import dev.simulated_team.simulated.content.blocks.swivel_bearing.link_block.Swi
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SwivelBridgeResolver {
     public static void refreshAround(BlockEntity origin) {
-        Level subLevel =
-                SableCompat.getSubLevel(
-                        level,
-                        swivel.getSubLevelID()
-                );
+        Level level = origin.getLevel();
 
         if (level == null || level.isClientSide) {
             return;
@@ -46,8 +45,7 @@ public class SwivelBridgeResolver {
         }
 
         for (Direction direction : Direction.values()) {
-            BlockPos pos = networkBlock.getBlockPos().relative(direction);
-            BlockEntity be = level.getBlockEntity(pos);
+            BlockEntity be = level.getBlockEntity(networkBlock.getBlockPos().relative(direction));
 
             if (be instanceof SwivelBearingBlockEntity swivel) {
                 resolveSwivel(level, swivel);
@@ -79,46 +77,29 @@ public class SwivelBridgeResolver {
         }
 
         WiredElement remote = swivel.isAssembled()
-                ? findAssembledRemote(level, swivel, facing)
+                ? findAssembledRemote(level, swivel)
                 : findUnassembledRemote(level, swivel, facing);
 
-        if (remote == null) {
+        if (remote == null || remote.getNode() == local.getNode()) {
             return;
         }
 
         SwivelBridgeManager.connect(local.getNode(), remote.getNode());
-        System.out.println(
-                "[CCE] Swivel assembled="
-                        + swivel.isAssembled()
-                        + " sublevel="
-                        + swivel.getSubLevelID()
-        );
-        System.out.println(
-                "[CCE] platePos=" + swivel.getPlatePos()
-        );
-        System.out.println(
-                "[CCE] remote=" + remote
-        );
     }
 
-    private static WiredElement findUnassembledRemote(Level level, SwivelBearingBlockEntity swivel, Direction facing) {
-        /*
-         * Bearing non assemblé :
-         *
-         * [network] [swivel] [network]
-         *
-         * On cherche le bloc réseau côté face du bearing.
-         */
+    private static WiredElement findUnassembledRemote(
+            Level level,
+            SwivelBearingBlockEntity swivel,
+            Direction facing
+    ) {
         BlockPos remotePos = swivel.getBlockPos().relative(facing);
         return findNetworkElement(level, remotePos, facing.getOpposite());
     }
 
     private static WiredElement findAssembledRemote(
             Level level,
-            SwivelBearingBlockEntity swivel,
-            Direction facing
+            SwivelBearingBlockEntity swivel
     ) {
-
         BlockPos platePos = swivel.getPlatePos();
 
         if (platePos == null) {
@@ -126,47 +107,73 @@ public class SwivelBridgeResolver {
         }
 
         /*
-         * récupération du sublevel sable
+         * Simulated place la plate dans le level principal à platePos.
+         * Le sublevel est utile pour retrouver/valider la contraption,
+         * mais la plate reste lisible via level.getBlockState(platePos).
          */
-
-        Level subLevel =
-                SableCompat.getSubLevel(
-                        level,
-                        swivel.getSubLevelID()
-                );
+        SubLevel subLevel = SableCompat.getSubLevel(level, swivel.getSubLevelID());
 
         if (subLevel == null) {
             return null;
         }
 
-        BlockState plateState =
-                subLevel.getBlockState(platePos);
+        BlockState plateState = level.getBlockState(platePos);
 
-        if (!(plateState.getBlock()
-                instanceof SwivelBearingPlateBlock)) {
-
+        if (!(plateState.getBlock() instanceof SwivelBearingPlateBlock)) {
             return null;
         }
 
-        Direction plateFacing =
-                plateState.getValue(
-                        SwivelBearingPlateBlock.FACING
-                );
+        Direction plateFacing = plateState.getValue(SwivelBearingPlateBlock.FACING);
 
         /*
-         * bloc derrière la plate
+         * Premier essai : le bloc réseau juste derrière la plate, dans le monde principal.
          */
+        BlockPos worldRemotePos = platePos.relative(plateFacing.getOpposite());
+        WiredElement remote = findNetworkElement(level, worldRemotePos, plateFacing);
 
-        BlockPos remotePos =
-                platePos.relative(
-                        plateFacing.getOpposite()
-                );
+        if (remote != null) {
+            return remote;
+        }
 
-        return findNetworkElement(
-                subLevel,
-                remotePos,
-                plateFacing
+        /*
+         * Deuxième essai : chercher autour de la plate dans le monde principal.
+         * C'est utile car Simulated garde souvent la link plate accessible en coordonnées plot.
+         */
+        remote = findAnyAdjacentNetwork(level, platePos);
+
+        if (remote != null) {
+            return remote;
+        }
+
+        /*
+         * Pour l’instant, on ne tente pas encore d’utiliser l'embedded LevelAccessor
+         * de Sable ici, parce que les capabilities NeoForge demandent un Level,
+         * pas seulement un LevelAccessor.
+         *
+         * L'étape suivante sera de récupérer le vrai Level/plot access de SubLevel
+         * si nécessaire selon le comportement observé en jeu.
+         */
+        return null;
+    }
+
+    private static WiredElement findNetworkElement(Level level, BlockPos pos, Direction side) {
+        WiredElement element = level.getCapability(
+                WiredElementCapability.get(),
+                pos,
+                side
         );
+
+        if (element != null) {
+            return element;
+        }
+
+        BlockEntity be = level.getBlockEntity(pos);
+
+        if (be instanceof NetworkCableHost host) {
+            return host.getNetworkElement();
+        }
+
+        return null;
     }
 
     private static WiredElement findAnyAdjacentNetwork(Level level, BlockPos pos) {
