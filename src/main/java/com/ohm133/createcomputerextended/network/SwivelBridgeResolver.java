@@ -17,7 +17,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class SwivelBridgeResolver {
     public static void refreshAround(BlockEntity origin) {
-        Level level = origin.getLevel();
+        Level subLevel =
+                SableCompat.getSubLevel(
+                        level,
+                        swivel.getSubLevelID()
+                );
 
         if (level == null || level.isClientSide) {
             return;
@@ -83,6 +87,18 @@ public class SwivelBridgeResolver {
         }
 
         SwivelBridgeManager.connect(local.getNode(), remote.getNode());
+        System.out.println(
+                "[CCE] Swivel assembled="
+                        + swivel.isAssembled()
+                        + " sublevel="
+                        + swivel.getSubLevelID()
+        );
+        System.out.println(
+                "[CCE] platePos=" + swivel.getPlatePos()
+        );
+        System.out.println(
+                "[CCE] remote=" + remote
+        );
     }
 
     private static WiredElement findUnassembledRemote(Level level, SwivelBearingBlockEntity swivel, Direction facing) {
@@ -97,59 +113,60 @@ public class SwivelBridgeResolver {
         return findNetworkElement(level, remotePos, facing.getOpposite());
     }
 
-    private static WiredElement findAssembledRemote(Level level, SwivelBearingBlockEntity swivel, Direction facing) {
-        /*
-         * Bearing assemblé :
-         *
-         * Simulated stocke la position de la plate avec getPlatePos().
-         * On tente d’abord une résolution monde simple autour de cette plate.
-         *
-         * Pour un vrai accès sublevel/contraption, il faudra probablement utiliser
-         * Sable SubLevelContainer avec swivel.getSubLevelID().
-         */
+    private static WiredElement findAssembledRemote(
+            Level level,
+            SwivelBearingBlockEntity swivel,
+            Direction facing
+    ) {
+
         BlockPos platePos = swivel.getPlatePos();
 
         if (platePos == null) {
             return null;
         }
 
-        BlockState plateState = level.getBlockState(platePos);
+        /*
+         * récupération du sublevel sable
+         */
 
-        if (!(plateState.getBlock() instanceof SwivelBearingPlateBlock)) {
+        Level subLevel =
+                SableCompat.getSubLevel(
+                        level,
+                        swivel.getSubLevelID()
+                );
+
+        if (subLevel == null) {
             return null;
         }
 
-        Direction plateFacing = plateState.getValue(SwivelBearingPlateBlock.FACING);
+        BlockState plateState =
+                subLevel.getBlockState(platePos);
 
-        BlockPos remotePos = platePos.relative(plateFacing.getOpposite());
+        if (!(plateState.getBlock()
+                instanceof SwivelBearingPlateBlock)) {
 
-        WiredElement remote = findNetworkElement(level, remotePos, plateFacing);
-
-        if (remote != null) {
-            return remote;
+            return null;
         }
 
-        return findAnyAdjacentNetwork(level, platePos);
-    }
+        Direction plateFacing =
+                plateState.getValue(
+                        SwivelBearingPlateBlock.FACING
+                );
 
-    private static WiredElement findNetworkElement(Level level, BlockPos pos, Direction side) {
-        WiredElement element = level.getCapability(
-                WiredElementCapability.get(),
-                pos,
-                side
+        /*
+         * bloc derrière la plate
+         */
+
+        BlockPos remotePos =
+                platePos.relative(
+                        plateFacing.getOpposite()
+                );
+
+        return findNetworkElement(
+                subLevel,
+                remotePos,
+                plateFacing
         );
-
-        if (element != null) {
-            return element;
-        }
-
-        BlockEntity be = level.getBlockEntity(pos);
-
-        if (be instanceof NetworkCableHost host) {
-            return host.getNetworkElement();
-        }
-
-        return null;
     }
 
     private static WiredElement findAnyAdjacentNetwork(Level level, BlockPos pos) {
