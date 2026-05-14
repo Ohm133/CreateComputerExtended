@@ -63,52 +63,72 @@ public class SwivelBridgeResolver {
         return findNetworkElement(level, swivel.getBlockPos().relative(facing), facing.getOpposite());
     }
 
-    private static WiredElement findAssembledRemote(Level level, SwivelBearingBlockEntity swivel) {
+    private static WiredElement findAssembledRemote(
+            Level level,
+            SwivelBearingBlockEntity swivel
+    ) {
         BlockPos platePos = swivel.getPlatePos();
-        if (platePos == null) return null;
 
-        Object subLevel = SableCompat.getSubLevel(level, swivel.getSubLevelID());
-        if (subLevel == null) {
-            System.out.println("[CCE] SubLevel not found for " + swivel.getSubLevelID());
+        if (platePos == null) {
+            System.out.println("[CCE] assembled remote failed: platePos=null");
             return null;
         }
 
-        /*
-         * 1) Essai monde normal : la plate est visible dans le monde principal.
-         */
-        WiredElement worldRemote = findAnyAdjacentNetwork(level, platePos);
-        if (worldRemote != null) return worldRemote;
+        Object subLevel = SableCompat.getSubLevel(level, swivel.getSubLevelID());
 
-        /*
-         * 2) Essai Sable : les blocs de la contraption sont dans l'embedded level accessor.
-         */
-        LevelAccessor embedded = SableCompat.getEmbeddedLevelAccessor(subLevel);
-
-        if (embedded == null) {
-            System.out.println("[CCE] Embedded LevelAccessor not found");
+        if (subLevel == null) {
+            System.out.println("[CCE] assembled remote failed: subLevel=null id=" + swivel.getSubLevelID());
             return null;
         }
 
         BlockState plateState = level.getBlockState(platePos);
-        if (plateState.getBlock() instanceof SwivelBearingPlateBlock) {
-            Direction plateFacing = plateState.getValue(SwivelBearingPlateBlock.FACING);
 
-            WiredElement direct = findNetworkHostInAccessor(
-                    embedded,
-                    platePos.relative(plateFacing.getOpposite())
-            );
-
-            if (direct != null) return direct;
+        if (!(plateState.getBlock() instanceof SwivelBearingPlateBlock)) {
+            System.out.println("[CCE] assembled remote failed: plate block invalid at " + platePos + " state=" + plateState);
+            return null;
         }
+
+        Direction plateFacing = plateState.getValue(SwivelBearingPlateBlock.FACING);
 
         /*
-         * 3) Fallback robuste : cherche tout bloc réseau autour de la plate dans le sublevel.
+         * IMPORTANT :
+         * Dans Simulated, le bloc de la contraption est côté plateFacing,
+         * pas côté plateFacing.getOpposite().
          */
-        for (Direction direction : Direction.values()) {
-            WiredElement element = findNetworkHostInAccessor(embedded, platePos.relative(direction));
-            if (element != null) return element;
+        BlockPos remotePos = platePos.relative(plateFacing);
+
+        WiredElement worldRemote = findNetworkElement(level, remotePos, plateFacing.getOpposite());
+
+        if (worldRemote != null) {
+            System.out.println("[CCE] assembled remote found in world at " + remotePos);
+            return worldRemote;
         }
 
+        LevelAccessor embedded = SableCompat.getEmbeddedLevelAccessor(subLevel);
+
+        if (embedded == null) {
+            System.out.println("[CCE] assembled remote failed: embedded accessor=null");
+            return null;
+        }
+
+        WiredElement embeddedRemote = findNetworkHostInAccessor(embedded, remotePos);
+
+        if (embeddedRemote != null) {
+            System.out.println("[CCE] assembled remote found in embedded level at " + remotePos);
+            return embeddedRemote;
+        }
+
+        for (Direction direction : Direction.values()) {
+            BlockPos testPos = platePos.relative(direction);
+            WiredElement element = findNetworkHostInAccessor(embedded, testPos);
+
+            if (element != null) {
+                System.out.println("[CCE] assembled remote fallback found at " + testPos);
+                return element;
+            }
+        }
+
+        System.out.println("[CCE] assembled remote failed: no network block around plate " + platePos);
         return null;
     }
 

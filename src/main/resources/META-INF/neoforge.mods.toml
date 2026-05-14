@@ -4,6 +4,9 @@ license="MIT"
 
 [[mods]]
 modId="createcomputerextended"
-version="1.0.0"
+version="0.1.0"
 displayName="Create Computer Extended"
 description="Network gearbox + CC integration mod"
+
+[[mixins]]
+config="createcomputerextended.mixins.json"
