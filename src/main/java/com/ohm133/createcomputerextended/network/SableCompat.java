@@ -1,7 +1,6 @@
 package com.ohm133.createcomputerextended.network;
 
 import dev.ryanhcode.sable.api.sublevel.SubLevelContainer;
-import dev.ryanhcode.sable.sublevel.SubLevel;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -13,7 +12,7 @@ import java.util.UUID;
 
 public class SableCompat {
     @Nullable
-    public static SubLevel getSubLevel(Level level, @Nullable UUID id) {
+    public static Object getSubLevel(Level level, @Nullable UUID id) {
         if (level == null || id == null) return null;
 
         SubLevelContainer container = SubLevelContainer.getContainer(level);
@@ -23,12 +22,19 @@ public class SableCompat {
     }
 
     @Nullable
-    public static LevelAccessor getEmbeddedLevelAccessor(SubLevel subLevel) {
-        try {
-            Object plot = subLevel.getPlot();
+    public static LevelAccessor getEmbeddedLevelAccessor(Object subLevel) {
+        if (subLevel == null) return null;
 
-            Method method = plot.getClass().getMethod("getEmbeddedLevelAccessor");
-            Object result = method.invoke(plot);
+        try {
+            Method getPlot = subLevel.getClass().getMethod("getPlot");
+            Object plot = getPlot.invoke(subLevel);
+
+            if (plot == null) return null;
+
+            Method getEmbeddedLevelAccessor =
+                    plot.getClass().getMethod("getEmbeddedLevelAccessor");
+
+            Object result = getEmbeddedLevelAccessor.invoke(plot);
 
             if (result instanceof LevelAccessor accessor) {
                 return accessor;

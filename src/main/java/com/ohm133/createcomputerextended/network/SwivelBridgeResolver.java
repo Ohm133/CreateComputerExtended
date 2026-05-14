@@ -5,7 +5,6 @@ import com.ohm133.createcomputerextended.blockentity.NetworkCableHost;
 import dan200.computercraft.api.network.wired.WiredElement;
 import dan200.computercraft.api.network.wired.WiredElementCapability;
 
-import dev.ryanhcode.sable.sublevel.SubLevel;
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.SwivelBearingBlock;
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.SwivelBearingBlockEntity;
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.link_block.SwivelBearingPlateBlock;
@@ -68,7 +67,7 @@ public class SwivelBridgeResolver {
         BlockPos platePos = swivel.getPlatePos();
         if (platePos == null) return null;
 
-        SubLevel subLevel = SableCompat.getSubLevel(level, swivel.getSubLevelID());
+        Object subLevel = SableCompat.getSubLevel(level, swivel.getSubLevelID());
         if (subLevel == null) {
             System.out.println("[CCE] SubLevel not found for " + swivel.getSubLevelID());
             return null;
