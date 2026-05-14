@@ -1,5 +1,6 @@
 package com.ohm133.createcomputerextended.network;
 
+import com.ohm133.createcomputerextended.network.SwivelBridgeManager;
 import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.network.wired.WiredElement;
 import dan200.computercraft.api.network.wired.WiredNode;
@@ -49,7 +50,7 @@ public class NetworkCableComponent implements WiredElement {
     }
 
     public void remove() {
-        SwivelBridgeManager.disconnectAllFor(node);
+
         node.remove();
     }
 }

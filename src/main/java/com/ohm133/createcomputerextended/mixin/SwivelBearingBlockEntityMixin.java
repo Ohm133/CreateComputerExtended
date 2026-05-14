@@ -1,7 +1,7 @@
 package com.ohm133.createcomputerextended.mixin;
 
 import com.ohm133.createcomputerextended.network.SwivelBridgeResolver;
-
+import com.ohm133.createcomputerextended.network.SwivelBridgeManager;
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.SwivelBearingBlockEntity;
 
 import net.minecraft.world.level.Level;
@@ -30,7 +30,9 @@ public abstract class SwivelBearingBlockEntityMixin {
         Level level = swivel.getLevel();
 
         if (level != null && !level.isClientSide) {
-            System.out.println("[CCE] Swivel disassembled hook: " + swivel.getBlockPos());
+
+            SwivelBridgeManager.disconnect(swivel.getBlockPos());
+
             SwivelBridgeResolver.resolveSwivel(level, swivel);
         }
     }

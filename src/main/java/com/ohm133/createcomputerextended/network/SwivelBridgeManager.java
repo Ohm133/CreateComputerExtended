@@ -2,41 +2,61 @@ package com.ohm133.createcomputerextended.network;
 
 import dan200.computercraft.api.network.wired.WiredNode;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import net.minecraft.core.BlockPos;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SwivelBridgeManager {
-    private static final Set<BridgeConnection> CONNECTIONS = new HashSet<>();
 
-    public static void connect(WiredNode a, WiredNode b) {
-        if (a == null || b == null || a == b) return;
+    private record Bridge(WiredNode a, WiredNode b) {}
 
-        BridgeConnection connection = new BridgeConnection(a, b);
+    /*
+     * 1 bridge par swivel
+     */
+    private static final Map<BlockPos, Bridge> ACTIVE_BRIDGES = new HashMap<>();
 
-        if (CONNECTIONS.add(connection)) {
-            a.connectTo(b);
+    public static void connect(BlockPos swivelPos, WiredNode a, WiredNode b) {
+        if (a == null || b == null) return;
+        if (a == b) return;
+
+        Bridge existing = ACTIVE_BRIDGES.get(swivelPos);
+
+        /*
+         * Déjà connecté exactement pareil
+         */
+        if (existing != null) {
+            boolean same =
+                    (existing.a == a && existing.b == b)
+                            || (existing.a == b && existing.b == a);
+
+            if (same) return;
+
+            /*
+             * Nouveau bridge différent :
+             * on nettoie l'ancien
+             */
+            disconnect(swivelPos);
         }
+
+        System.out.println("[CCE] connect bridge " + swivelPos);
+
+        a.connectTo(b);
+
+        ACTIVE_BRIDGES.put(swivelPos, new Bridge(a, b));
     }
 
-    public static void disconnect(WiredNode a, WiredNode b) {
-        BridgeConnection connection = new BridgeConnection(a, b);
+    public static void disconnect(BlockPos swivelPos) {
+        Bridge bridge = ACTIVE_BRIDGES.remove(swivelPos);
 
-        if (CONNECTIONS.remove(connection)) {
-            a.disconnectFrom(b);
-        }
-    }
+        if (bridge == null) return;
 
-    public static void disconnectAllFor(WiredNode node) {
-        Iterator<BridgeConnection> iterator = CONNECTIONS.iterator();
+        try {
+            System.out.println("[CCE] disconnect bridge " + swivelPos);
 
-        while (iterator.hasNext()) {
-            BridgeConnection connection = iterator.next();
-
-            if (connection.contains(node)) {
-                connection.a().disconnectFrom(connection.b());
-                iterator.remove();
-            }
+            bridge.a.disconnectFrom(bridge.b);
+        } catch (Exception e) {
+            System.out.println("[CCE] disconnect failed " + e);
         }
     }
 }

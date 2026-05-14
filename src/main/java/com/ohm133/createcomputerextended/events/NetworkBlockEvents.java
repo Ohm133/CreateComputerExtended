@@ -1,8 +1,9 @@
-package com.ohm133.createcomputerextended.event;
+package com.ohm133.createcomputerextended.events;
 
 import com.ohm133.createcomputerextended.CreateComputerExtended;
 import com.ohm133.createcomputerextended.blockentity.NetworkCableHost;
 import com.ohm133.createcomputerextended.network.SwivelBridgeResolver;
+import com.ohm133.createcomputerextended.network.SwivelBridgeManager;
 
 import dev.simulated_team.simulated.content.blocks.swivel_bearing.SwivelBearingBlockEntity;
 
@@ -26,16 +27,17 @@ public class NetworkBlockEvents {
 
     @SubscribeEvent
     public static void onBlockBroken(BlockEvent.BreakEvent event) {
-        if (event.getLevel() instanceof Level level && !level.isClientSide) {
-            refreshAround(level, event.getPos());
+        if (!(event.getLevel() instanceof Level level) || level.isClientSide) {
+            return;
         }
-    }
 
-    @SubscribeEvent
-    public static void onNeighborNotify(BlockEvent.NeighborNotifyEvent event) {
-        if (event.getLevel() instanceof Level level && !level.isClientSide) {
-            refreshAround(level, event.getPos());
+        BlockEntity be = level.getBlockEntity(event.getPos());
+
+        if (be instanceof SwivelBearingBlockEntity) {
+            SwivelBridgeManager.disconnect(event.getPos());
         }
+
+        refreshAround(level, event.getPos());
     }
 
     private static void refreshAround(Level level, BlockPos pos) {

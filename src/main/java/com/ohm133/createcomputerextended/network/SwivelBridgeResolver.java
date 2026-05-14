@@ -54,9 +54,16 @@ public class SwivelBridgeResolver {
                 + " local=" + local
                 + " remote=" + remote);
 
-        if (remote == null || remote.getNode() == local.getNode()) return;
+        if (remote == null || remote.getNode() == local.getNode()) {
+            SwivelBridgeManager.disconnect(swivel.getBlockPos());
+            return;
+        }
 
-        SwivelBridgeManager.connect(local.getNode(), remote.getNode());
+        SwivelBridgeManager.connect(
+                swivel.getBlockPos(),
+                local.getNode(),
+                remote.getNode()
+        );
     }
 
     private static WiredElement findUnassembledRemote(Level level, SwivelBearingBlockEntity swivel, Direction facing) {
