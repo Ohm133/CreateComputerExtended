@@ -1,3 +1,10 @@
 {
-  "parent": "createcomputerextended:block/network_gearbox/block"
+  "parent": "create:block/gearbox/item",
+  "textures": {
+    "0": "createcomputerextended:block/network_casing",
+    "1": "createcomputerextended:block/network_gearbox_side",
+    "particle": "create:block/axis",
+    "1_0": "create:block/axis",
+    "1_1": "create:block/axis_top"
+  }
 }

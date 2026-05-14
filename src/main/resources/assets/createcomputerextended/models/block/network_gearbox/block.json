@@ -1,7 +1,7 @@
 {
   "parent": "create:block/gearbox/block",
   "textures": {
-    "0": "createcomputerextended:block/network_gearbox",
+    "0": "createcomputerextended:block/network_casing",
     "1": "createcomputerextended:block/network_gearbox_side",
     "particle": "createcomputerextended:block/network_casing"
   }

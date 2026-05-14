@@ -1,8 +1,0 @@
-{
-  "parent": "create:block/encased_shaft/block_andesite",
-  "textures": {
-    "0": "createcomputerextended:block/network_encased_shaft",
-    "1": "createcomputerextended:block/network_encased_shaft_side",
-    "particle": "createcomputerextended:block/network_casing"
-  }
-}

@@ -1,5 +1,5 @@
 {
-  "parent": "create:block/encased_shaft/item",
+  "parent": "create:block/encased_shaft/block",
   "textures": {
     "casing": "createcomputerextended:block/network_casing",
     "opening": "createcomputerextended:block/network_gearbox_side"
