@@ -31,12 +31,6 @@ public class NetworkBlockEvents {
             return;
         }
 
-        BlockEntity be = level.getBlockEntity(event.getPos());
-
-        if (be instanceof SwivelBearingBlockEntity) {
-            SwivelBridgeManager.disconnect(event.getPos());
-        }
-
         refreshAround(level, event.getPos());
     }
 

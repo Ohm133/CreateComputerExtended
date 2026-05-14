@@ -110,7 +110,7 @@ public class SwivelBridgeResolver {
             System.out.println("[CCE] assembled remote found in world at " + remotePos);
             return worldRemote;
         }
-
+/*
         LevelAccessor embedded = SableCompat.getEmbeddedLevelAccessor(subLevel);
 
         if (embedded == null) {
@@ -133,7 +133,7 @@ public class SwivelBridgeResolver {
                 System.out.println("[CCE] assembled remote fallback found at " + testPos);
                 return element;
             }
-        }
+        }*/
 
         System.out.println("[CCE] assembled remote failed: no network block around plate " + platePos);
         return null;

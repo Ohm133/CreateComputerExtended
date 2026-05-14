@@ -24,16 +24,23 @@ public abstract class SwivelBearingBlockEntityMixin {
         }
     }
 
-    @Inject(method = "disassemble", at = @At("TAIL"), remap = false)
-    private void createcomputerextended$afterDisassemble(CallbackInfo ci) {
+    @Inject(method = "disassemble", at = @At("HEAD"), remap = false)
+    private void createcomputerextended$beforeDisassemble(CallbackInfo ci) {
         SwivelBearingBlockEntity swivel = (SwivelBearingBlockEntity) (Object) this;
         Level level = swivel.getLevel();
 
         if (level != null && !level.isClientSide) {
-
             SwivelBridgeManager.disconnect(swivel.getBlockPos());
+        }
+    }
+    @Inject(method = "remove", at = @At("HEAD"), remap = false)
+    private void createcomputerextended$onRemove(CallbackInfo ci) {
+        SwivelBearingBlockEntity swivel = (SwivelBearingBlockEntity) (Object) this;
+        Level level = swivel.getLevel();
 
-            SwivelBridgeResolver.resolveSwivel(level, swivel);
+        if (level != null && !level.isClientSide) {
+            System.out.println("[CCE] Swivel removed hook: " + swivel.getBlockPos());
+            SwivelBridgeManager.disconnect(swivel.getBlockPos());
         }
     }
 }
