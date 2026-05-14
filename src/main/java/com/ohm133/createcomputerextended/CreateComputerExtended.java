@@ -23,7 +23,6 @@ public class CreateComputerExtended {
         ModItems.ITEMS.register(modBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modBus);
 
-        modBus.addListener(this::registerCapabilities);
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
